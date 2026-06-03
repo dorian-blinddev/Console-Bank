@@ -1,18 +1,18 @@
 ﻿decimal balance = 1000.0m;
 bool isRunning = true;
 
-Console.WriteLine("Chào mừng bạn đến với ngân hàng!");
+Console.WriteLine("Welcome to the E-Banking System!");
 
 do
 {
     Console.WriteLine("""
-Danh sách lựa chọn:
-1. Xem số dư
-2. Nạp tiền
-3. Rút tiền
-4. Chuyển tiền
-0. Thoát
-Vui lòng chọn tính năng (0-4)
+Please select an option:
+1. Check Balance
+2. Deposit Money
+3. Withdraw Money
+4. Transfer Money
+0. Exit
+Enter your choice (0-4):
 """);
 
     if (int.TryParse(Console.ReadLine(), out int choice) && (choice >= 0 && choice <= 4))
@@ -32,35 +32,39 @@ Vui lòng chọn tính năng (0-4)
                 balance = Transfer(balance);
                 break;
             case 0:
-                Console.WriteLine("Cảm ơn bạn đã xử dụng dịch vụ, tạm biệt!");
+                Console.WriteLine("Thank you for using our services. Goodbye!");
                 isRunning = false;
                 break;
         }
     }
     else
     {
-        Console.WriteLine("Lựa chọn không hợp lệ, vui lòng nhập một trong các số từ 0 đến 4");
+        Console.WriteLine("Invalid choice. Please enter a number between 0 and 4.");
     }
+    
+    // Thêm một dòng trống để giao diện Console dễ nhìn hơn sau mỗi lượt giao dịch
+    Console.WriteLine(); 
+
 } while (isRunning);
 
 static void CheckBalance(decimal balance)
 {
-    Console.WriteLine($"Số dư tài hoản hiện tại của bạn là: {balance}");
+    Console.WriteLine($"Your current balance is: ${balance}");
 }
 
 static decimal Deposit(decimal balance)
 {
-    Console.WriteLine("Nhập số tiền bạn muốn nạp:");
+    Console.WriteLine("Enter the amount you want to deposit:");
 
     if (decimal.TryParse(Console.ReadLine(), out decimal depositAmount) && depositAmount > 0)
     {
         balance += depositAmount;
-        Console.WriteLine($"Nạp tiền thành công!");
+        Console.WriteLine("Deposit successful!");
         CheckBalance(balance);
     }
     else
     {
-        Console.WriteLine("Số tiền nạp không hợp lệ!");
+        Console.WriteLine("Invalid deposit amount!");
     }
 
     return balance;
@@ -68,20 +72,20 @@ static decimal Deposit(decimal balance)
 
 static decimal Withdraw(decimal balance)
 {
-    Console.WriteLine("Nhập số tiền bản muốn rút:");
+    Console.WriteLine("Enter the amount you want to withdraw:");
 
     if ((decimal.TryParse(Console.ReadLine(), out decimal withdrawalAmount) == false) || (withdrawalAmount <= 0))
     {
-        Console.WriteLine("Số tiền rút không hợp lệ!");
+        Console.WriteLine("Invalid withdrawal amount!");
     }
     else if (withdrawalAmount > balance)
     {
-        Console.WriteLine("Tài khoản không đủ tiền để thực hiện giao dịch");
+        Console.WriteLine("Insufficient funds! Your balance is not enough for this transaction.");
     }
     else
     {
         balance -= withdrawalAmount;
-        Console.WriteLine($"Rút tiền thành công!");
+        Console.WriteLine("Withdrawal successful!");
         CheckBalance(balance);
     }
 
@@ -91,29 +95,28 @@ static decimal Withdraw(decimal balance)
 static decimal Transfer(decimal balance)
 {
     int recipientAccountNumber = 0;
-    Console.WriteLine("Nhập số tài khoản người nhận:");
+    Console.WriteLine("Enter the recipient's account number:");
 
-    // Ở mức cơ bản, tạm xem mọi recipientAccountNumber đều hợp lệ. Miễn không trống rổng và là số nguyên
     if (int.TryParse(Console.ReadLine(), out recipientAccountNumber) == false)
     {
-        Console.WriteLine("Số tài khoản người nhận không hợp lệ!");
+        Console.WriteLine("Invalid account number!");
         return balance;
     }
 
-    Console.WriteLine($"Nhập số tiền bản muốn chuyển cho: {recipientAccountNumber}");
+    Console.WriteLine($"Enter the amount you want to transfer to account {recipientAccountNumber}:");
 
     if ((decimal.TryParse(Console.ReadLine(), out decimal transferAmount) == false) || (transferAmount <= 0))
     {
-        Console.WriteLine("Số tiền chuyển không hợp lệ!");
+        Console.WriteLine("Invalid transfer amount!");
     }
     else if (transferAmount > balance)
     {
-        Console.WriteLine("Tài khoản không đủ tiền để thực hiện giao dịch");
+        Console.WriteLine("Insufficient funds! Your balance is not enough for this transaction.");
     }
     else
     {
         balance -= transferAmount;
-        Console.WriteLine($"Đã chuyển thành công {transferAmount} đến số tài khoản {recipientAccountNumber}!");
+        Console.WriteLine($"Successfully transferred ${transferAmount} to account {recipientAccountNumber}!");
         CheckBalance(balance);
     }
 
