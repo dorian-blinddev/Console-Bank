@@ -42,3 +42,23 @@ Vui lòng chọn tính năng (0-4)
         Console.WriteLine("Lựa chọn không hợp lệ, vui lòng nhập một trong các số từ 0 đến 4");
     }
 } while (isRunning);
+
+static void CheckBalance(decimal balance)
+{
+    Console.WriteLine($"Số dư tài hoản hiện tại của bạn là: {balance}");
+}
+
+static decimal Deposit(decimal balance)
+{
+    Console.WriteLine("Nhập số tiền bạn muốn nạp:");
+
+if (decimal.TryParse(Console.ReadLine(), out decimal depositAmount) && depositAmount > 0)
+{
+    balance += depositAmount;
+    Console.WriteLine($"Nạp tiền thành công!");
+    CheckBalance(balance);
+}
+else
+{
+    Console.WriteLine("Số tiền nạp không hợp lệ!");
+}
