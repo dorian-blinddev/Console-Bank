@@ -1,0 +1,70 @@
+name: Publish Native AOT Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Chạy khi bạn push tag có dạng v1.0, v2.0...
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+            artifact_name: tool-windows.exe
+          - os: ubuntu-latest
+            rid: linux-x64
+            artifact_name: tool-linux
+          - os: macos-latest
+            rid: osx-x64
+            artifact_name: tool-macos
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0 # Đổi thành 9.0 nếu bạn dùng .NET 9
+
+    - name: Publish Native AOT
+      run: dotnet publish -r ${{ matrix.rid }} -c Release -o ./publish-output
+
+    # Đổi tên file để phân biệt giữa các hệ điều hành
+    - name: Rename executable
+      shell: bash
+      run: |
+        cd ./publish-output
+        if [ "${{ matrix.os }}" = "windows-latest" ]; then
+          mv *.exe ../${{ matrix.artifact_name }}
+        else
+          # Tìm file thực thi không có đuôi trên Linux/Mac
+          find . -maxdepth 1 -type f ! -name "*.*" -exec mv {} ../${{ matrix.artifact_name }} \;
+        fi
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.rid }}-bin
+        path: ${{ matrix.artifact_name }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          win-x64-bin/tool-windows.exe
+          linux-x64-bin/tool-linux
+          osx-x64-bin/tool-macos
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
